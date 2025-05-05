@@ -31,8 +31,8 @@ export const useLoginContext = () => {
 };
 
 const Login = () => {
-  const [username, SetUsername] = useState<string>("");
-  const [password, SetPassword] = useState<string>("");
+  const [username, SetUsername] = useState<string>("m");
+  const [password, SetPassword] = useState<string>("111111");
   const {SetMyName,SetIsLogin}=useLoginContext();
   const nav = useNavigate();
 
@@ -40,21 +40,23 @@ const Login = () => {
     if(!username||!password)
       return
     try {
-      // const res = await axios.post(`http://localhost:8080/api/user/login`, {
-      //   UserName: username,
-      //   Password: password,
-      // });
-      const r=1;
+      console.log(username,"*");
+      
+      const res = await axios.post(`http://localhost:8080/api/user/login`, {
+        UserName: username,
+        Password: password,
+      });
+      localStorage.setItem("userId",res.data.Id)
       SetMyName(username)
       SetIsLogin(true)
-      nav("/home/");
+      nav("/home");
     } catch {
-      nav("/signin/");
+      nav("/signup");
       console.error("failad");
     }
   };
   const MoveToSignIn = () => {
-    nav("/signin/");
+    nav("/signup");
   };
   return (
     <>
@@ -70,7 +72,7 @@ const Login = () => {
           boxShadow: 3,
         }}
       >
-        <h2>Enter your details!!</h2>
+        <h2>Welcome!!</h2>
         <Box
           sx={{
             display: "flex",
@@ -101,9 +103,12 @@ const Login = () => {
                 backgroundColor: "#d32f2f",
                 color: "#fff",
               },
+              "&.Mui-focused fieldset": {
+                borderColor: "#d32f2f !important",
+              },
             }}
           >
-            Press to Sign In
+            Press to SignUp
           </Button>
           
           <TextField
@@ -122,6 +127,9 @@ const Login = () => {
                 },
                 "&:hover fieldset": {
                   borderColor: "#d32f2f", // Red border color on hover
+                },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d32f2f !important",
                 },
               },
             }}
@@ -145,6 +153,9 @@ const Login = () => {
                 "&:hover fieldset": {
                   borderColor: "#d32f2f", // Red border color on hover
                 },
+                "&.Mui-focused fieldset": {
+                  borderColor: "#d32f2f !important",
+                },
               },
             }}
           />
@@ -165,6 +176,7 @@ const Login = () => {
                 "&:hover": {
                   backgroundColor: "#b71c1c", // Darker red on hover
                 },
+                
               }}
             >
               Send
