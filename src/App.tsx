@@ -5,14 +5,15 @@ import RecipeReviewCard from "./components/recipes";
 import { Outlet } from "react-router-dom";
 import Header from "./components/header";
 import Test from "./components/test"
+import Test2 from "./components/test copy";
 
 function App() {
   return (
     <>
-      {/* <Header />
+      <Header />
       <br />
-      <Home /> */}
-      <Test/>
+      <Home />
+      {/* <Test2/> */}
       <Outlet />
       {/* <RecipeReviewCard/> */}
     </>

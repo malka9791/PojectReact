@@ -1,28 +1,60 @@
-import { duration, TextField } from "@mui/material";
+import { duration, TextField, Box } from "@mui/material";
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import  * as yup from "yup"
+import * as yup from "yup";
 type FormValues = {
   Recipe: {
     id: number;
     name: string;
-    pictureUrl: string;
+    imageUrl: string;
     duration: number;
     difficulty: number;
     description: string;
+    Ingrident:{
+      
+    }
   }[];
 };
 
 const schema = yup.object().shape({
-
   Recipe: yup.array().of(
     yup.object().shape({
-      id: yup.number().required("City is required"),
-      name: yup.string().required("Street name is required"),
-      pictureUrl: yup.string().required("Street number must be positive"),
-      duration: yup.number().required("City is required"),
-      difficulty: yup.number().required("City is required"),
-      description: yup.string().required("Street number must be positive"),
+      id: yup
+        .number()
+        .typeError("ID must be a number") // מוודא שהערך מספרי
+        .transform((value, originalValue) =>
+          originalValue === "" ? undefined : value
+        )
+        .required("ID is required"),
+      name: yup.string().required("name is required"),
+      imageUrl: yup
+        .string()
+        .required("imageUrl must be positive")
+        .typeError("description is required") // מוודא שהערך מספרי
+        .transform((value, originalValue) =>
+          originalValue === "" ? undefined : value
+        ),
+      duration: yup
+        .number()
+        .required("duration is required")
+        .typeError("duration is required") // מוודא שהערך מספרי
+        .transform((value, originalValue) =>
+          originalValue === "" ? undefined : value
+        ),
+      difficulty: yup
+        .number()
+        .required("difficulty is required")
+        .typeError("dufficulty is required") // מוודא שהערך מספרי
+        .transform((value, originalValue) =>
+          originalValue === "" ? undefined : value
+        ),
+      description: yup
+        .string()
+        .required("description is required")
+        .typeError("description is required") // מוודא שהערך מספרי
+        .transform((value, originalValue) =>
+          originalValue === "" ? undefined : value
+        ),
     })
   ),
 });
@@ -34,13 +66,13 @@ export default function Test() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver:yupResolver(schema),
+    resolver: yupResolver(schema),
     defaultValues: {
       Recipe: [
         {
           id: undefined,
           name: "",
-          pictureUrl: "",
+          imageUrl: "",
           duration: undefined,
           difficulty: undefined,
           description: "",
@@ -62,71 +94,170 @@ export default function Test() {
           return (
             <div key={field.id}>
               <section className={"section"} key={field.id}>
-                <TextField
-                  placeholder="id"
-                  type="number"
-                  label="id"
-                  {...register(`Recipe.${index}.id` as const, {
-                    required: true,
-                  })}
-                  className={errors?.Recipe?.[index]?.id ? "error" : ""}
-                />
-                <p>{errors?.Recipe?.[index]?.id?.message}</p>
+                <Box
+                  sx={{
+                    padding: 3,
+                    borderRadius: 2,
+                    width: 300,
+                    margin: "auto",
+                    boxShadow: 3,
+                  }}
+                >
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="number"
+                    label="id"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.id` as const, {
+                      required: true,
+                      valueAsNumber: true,
+                    })}
+                    className={errors?.Recipe?.[index]?.id ? "error" : ""}
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.id?.message}</p>
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="string"
+                    label="name"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.name` as const, {
+                      required: true,
+                    })}
+                    className={errors?.Recipe?.[index]?.name ? "error" : ""}
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.name?.message}</p>
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="string"
+                    label="imageUrl"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.imageUrl` as const, {
+                      required: true,
+                    })}
+                    className={errors?.Recipe?.[index]?.imageUrl ? "error" : ""}
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.imageUrl?.message}</p>
 
-                <TextField
-                  placeholder="name"
-                  type="string"
-                  label="name"
-                  {...register(`Recipe.${index}.name` as const, {
-                    required: true,
-                  })}
-                  className={errors?.Recipe?.[index]?.name ? "error" : ""}
-                />
-                <p>{errors?.Recipe?.[index]?.name?.message}</p>
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="number"
+                    label="duration"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.duration` as const, {
+                      required: true,
+                    })}
+                    className={errors?.Recipe?.[index]?.duration ? "error" : ""}
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.duration?.message}</p>
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="number"
+                    label="difficulty"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.difficulty` as const, {
+                      required: true,
+                    })}
+                    className={
+                      errors?.Recipe?.[index]?.difficulty ? "error" : ""
+                    }
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.difficulty?.message}</p>
+                  <TextField
+                    required
+                    id="outlined-username"
+                    type="string"
+                    label="description"
+                    variant="outlined"
+                    {...register(`Recipe.${index}.description` as const, {
+                      required: true,
+                    })}
+                    className={
+                      errors?.Recipe?.[index]?.description ? "error" : ""
+                    }
+                    margin="normal"
+                    fullWidth
+                    sx={{
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#d32f2f", // Red border color
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#d32f2f", // Red border color on hover
+                        },
+                      },
+                    }}
+                  />
+                  <p>{errors?.Recipe?.[index]?.description?.message}</p>
+                </Box>
 
-                <TextField
-                  placeholder="pictureUrl"
-                  type="string"
-                  label="picture"
-                  {...register(`Recipe.${index}.pictureUrl` as const, {
-                    // valueAsNumber: true,
-                    required: true,
-                  })}
-                  className={errors?.Recipe?.[index]?.pictureUrl ? "error" : ""}
-                />
-                 <TextField
-                  placeholder="duration"
-                  type="string"
-                  label="picture"
-                  {...register(`Recipe.${index}.duration` as const, {
-                    valueAsNumber: true,
-                    required: true,
-                  })}
-                  className={errors?.Recipe?.[index]?.duration ? "error" : ""}
-                /> <TextField
-                placeholder="difficulty"
-                type="string"
-                label="difficulty"
-                {...register(`Recipe.${index}.difficulty` as const, {
-                  valueAsNumber: true,
-                  required: true,
-                })}
-                className={errors?.Recipe?.[index]?.difficulty ? "error" : ""}
-              />
-                <p>{errors?.Recipe?.[index]?.difficulty?.message}</p>
-                <TextField
-                  placeholder="description"
-                  type="string"
-                  label="description"
-                  {...register(`Recipe.${index}.description` as const, {
-                    valueAsNumber: true,
-                    required: true,
-                  })}
-                  className={errors?.Recipe?.[index]?.description ? "error" : ""}
-                />
-                <button type="button" onClick={() => remove(index)}>
+                {/* <button type="button" onClick={() => remove(index)}>
                   DELETE
-                </button>
+                </button> */}
               </section>
             </div>
           );
@@ -134,7 +265,7 @@ export default function Test() {
 
         {/* <Total control={control} /> */}
 
-        <button
+        {/* <button
           type="button"
           onClick={
             () => console.log("")
@@ -147,7 +278,7 @@ export default function Test() {
           }
         >
           APPEND
-        </button>
+        </button> */}
         <input className="submit" type="submit" value="Send" />
       </form>
     </div>

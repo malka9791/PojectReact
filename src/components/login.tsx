@@ -40,10 +40,11 @@ const Login = () => {
     if(!username||!password)
       return
     try {
-      const res = await axios.post(`http://localhost:8080/api/user/login`, {
-        UserName: username,
-        Password: password,
-      });
+      // const res = await axios.post(`http://localhost:8080/api/user/login`, {
+      //   UserName: username,
+      //   Password: password,
+      // });
+      const r=1;
       SetMyName(username)
       SetIsLogin(true)
       nav("/home/");
