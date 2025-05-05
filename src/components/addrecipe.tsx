@@ -8,10 +8,9 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Add, Category, Delete } from "@mui/icons-material";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import Header from "./header";
 import { useEffect, useState } from "react";
 import axios from "axios";
 
@@ -119,15 +118,16 @@ const AddRecipe = () => {
         Duration: undefined,
         Difficulty: undefined,
         Description: "",
-        UserId: localStorage.getItem("UserId")
-          ? Number(localStorage.getItem("UserId"))
+        UserId: localStorage.getItem("userId")
+          ? Number(localStorage.getItem("userId"))
           : undefined,
         CategoryId: undefined,
-        Ingridents: [],
+        Ingridents: [{ Name: "", count: 1, type1: "" }],
       },
     },
     mode: "onBlur",
   });
+  const watchedValues = useWatch({ control });
 
   const {
     fields: instructionFields,
@@ -151,7 +151,10 @@ const AddRecipe = () => {
     console.log(data);
 
     try {
-      const res = await axios.post("http://localhost:8080/api/recipe", data);
+      const res = await axios.post(
+        "http://localhost:8080/api/recipe",
+        data.Recipe
+      );
       console.log(res.data);
     } catch (err) {
       console.error(err);
@@ -160,7 +163,6 @@ const AddRecipe = () => {
 
   return (
     <>
-      <Header />
       <Box sx={{ display: "flex", justifyContent: "center", mt: 10 }}>
         <Paper
           elevation={6}
@@ -209,7 +211,9 @@ const AddRecipe = () => {
 
               <Grid item xs={6}>
                 <TextField
-                  {...register("Recipe.Duration")}
+                  {...register("Recipe.Duration", {
+                    setValueAs: (v) => (v === "" ? null : Number(v)),
+                  })}
                   label="זמן הכנה (דקות)"
                   type="number"
                   fullWidth
@@ -222,7 +226,9 @@ const AddRecipe = () => {
 
               <Grid item xs={6}>
                 <TextField
-                  {...register("Recipe.Difficulty")}
+                  {...register("Recipe.Difficulty", {
+                    setValueAs: (v) => (v === "" ? null : Number(v)),
+                  })}
                   label="רמת קושי (1-5)"
                   type="number"
                   fullWidth
@@ -251,7 +257,10 @@ const AddRecipe = () => {
                   select
                   label="קטגוריה"
                   fullWidth
-                  {...register("Recipe.CategoryId")}
+                  defaultValue={""}
+                  {...register("Recipe.CategoryId", {
+                    setValueAs: (v) => (v === "" ? null : Number(v)),
+                  })}
                   error={!!errors.Recipe?.CategoryId}
                 >
                   <MenuItem value="">
@@ -329,7 +338,9 @@ const AddRecipe = () => {
                       fullWidth
                     />
                     <TextField
-                      {...register(`Recipe.Ingridents.${index}.count`)}
+                      {...register(`Recipe.Ingridents.${index}.count`, {
+                        setValueAs: (v) => (v === "" ? null : Number(v)),
+                      })}
                       label="כמות"
                       type="number"
                       sx={{ width: "80px" }}
@@ -363,6 +374,13 @@ const AddRecipe = () => {
 
               {/* כפתור שליחה */}
               <Grid item xs={12} sx={{ textAlign: "center", mt: 2 }}>
+                <Button
+                  onClick={() => {
+                    console.log(watchedValues);
+                  }}
+                >
+                  להדפסת הנתונים
+                </Button>
                 <Button
                   type="submit"
                   variant="contained"
