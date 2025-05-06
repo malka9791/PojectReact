@@ -13,6 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
 
 type FormValues = {
   Recipe: {
@@ -90,8 +91,12 @@ type Category = {
   createdAt: Date;
   updatedAt: Date;
 };
-const AddRecipe = () => {
+
+const UpdateRecipe = () => {
+  // const UpdateRecipe = ({ recipeId }: { recipeId: number }) => {
+  const { recipeId } = useParams();
   const [categories, setCategories] = useState<Category[]>([]);
+  const [recipe, setRecipe] = useState<FormValues>();
   const getCategories = async () => {
     try {
       const res = await axios.get("http://localhost:8080/api/category");
@@ -100,12 +105,27 @@ const AddRecipe = () => {
       console.error("failed to load the categories");
     }
   };
+  const getRecipe = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8080/api/recipe/${recipeId}`
+      );
+      setRecipe(res.data);
+      reset({ Recipe: res.data.Recipe }); // זה הפתרון
+    } catch (err) {
+      console.error("failed to load the recipe");
+    }
+  };
   useEffect(() => {
-    getCategories();
-  }, []);
+    if (recipeId) {
+      getRecipe();
+      getCategories();
+    }
+  }, [recipeId]);
   //form setting
   const {
     register,
+    reset,
     control,
     handleSubmit,
     formState: { errors },
@@ -152,9 +172,9 @@ const AddRecipe = () => {
     const fixedData = {
       ...data.Recipe,
       Categoryid: Number(data.Recipe.Categoryid),
-      UserId:Number(data.Recipe.UserId)
+      UserId: Number(data.Recipe.UserId),
     };
-  
+
     console.log("נתונים מתוקנים:", fixedData);
     console.log(JSON.stringify(fixedData, null, 2));
 
@@ -173,7 +193,7 @@ const AddRecipe = () => {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center"}}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Paper
           elevation={6}
           sx={{
@@ -190,7 +210,7 @@ const AddRecipe = () => {
             align="center"
             color="#d32f2f"
           >
-            הוסף מתכון
+            עריכת מתכון
           </Typography>
 
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -391,7 +411,6 @@ const AddRecipe = () => {
                   onClick={() => {
                     console.log(watchedValues);
                     console.log(JSON.stringify(watchedValues, null, 2));
-
                   }}
                 >
                   להדפסת הנתונים
@@ -417,4 +436,4 @@ const AddRecipe = () => {
   );
 };
 
-export default AddRecipe;
+export default UpdateRecipe;

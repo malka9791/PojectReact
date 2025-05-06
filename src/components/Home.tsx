@@ -9,7 +9,6 @@ const Home = () => {
   return (
 <>
 <Header />
-      <br />
       <div >
         <img
           src={cake1}
@@ -17,7 +16,7 @@ const Home = () => {
           style={{
             width: "500px",
             height: "auto",
-            margin: "50px 15px 0px 15px",
+             margin: "  0px 15px",
           }}
         />
         <img
@@ -26,7 +25,7 @@ const Home = () => {
           style={{
             width: "510px",
             height: "auto",
-            margin: "50px 15px 0px 15px",
+             margin: "  0px 15px",
           }}
         />
         <img
@@ -35,7 +34,7 @@ const Home = () => {
           style={{
             width: "600px",
             height: "auto",
-            margin: "0px 15px 0px 15px",
+            margin: "0px 15px",
           }}
         />
         <AboutUs/>

@@ -4,7 +4,6 @@ import Header from "./header";
 const AboutUs = () => {
   return (
     <>
-    <Header/>
     <h2 style={{ color: "#d32f2f" }}>Foody</h2>
     <Box
       sx={{

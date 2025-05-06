@@ -1,150 +1,202 @@
-import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import CardMedia from '@mui/material/CardMedia';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
-import Avatar from '@mui/material/Avatar';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
-import FavoriteIcon from '@mui/icons-material/Favorite';
-import ShareIcon from '@mui/icons-material/Share';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import MoreVertIcon from '@mui/icons-material/MoreVert';
-import axios from 'axios';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardMedia,
+  IconButton,
+  Typography,
+  CardActions,
+  Collapse,
+  Tooltip,
+  Modal,
+  Button,
+} from "@mui/material";
+import {
+  Edit as EditIcon,
+  Delete as DeleteIcon,
+  Info as InfoIcon,
+  ExpandMore as ExpandMoreIcon,
+  MenuBook as MenuBookIcon,
+} from "@mui/icons-material";
+import axios from "axios";
+import { Box } from "@mui/system";
+import { Link } from "react-router-dom";
 
-interface ExpandMoreProps extends IconButtonProps {
-  expand: boolean;
-}
-
-const ExpandMore = styled((props: ExpandMoreProps) => {
-  const { expand, ...other } = props;
-  return <IconButton {...other} />;
-})(({ theme }) => ({
-  marginLeft: 'auto',
-  transition: theme.transitions.create('transform', {
-    duration: theme.transitions.duration.shortest,
-  }),
-  variants: [
-    {
-      props: ({ expand }) => !expand,
-      style: {
-        transform: 'rotate(0deg)',
-      },
-    },
-    {
-      props: ({ expand }) => !!expand,
-      style: {
-        transform: 'rotate(180deg)',
-      },
-    },
-  ],
-}));
 type Recipe = {
   Id: number;
   Name: string;
-  Instructions: string[];
-  Difficulty: number;
-  Duration: number;
   Description: string;
-  UserId: number;
-  CategoryId: number;
   Img: string;
-  Intrident: {
-    Id:number;
-    Name: number;
-    Count: number;
-    Type: string;
-  }[]
+  UserId: number;
 };
+
 const RecipeReviewCard = () => {
-  const [expanded, setExpanded] = useState(false);
+  const [expandedRecipeId, setExpandedRecipeId] = useState<number | null>(null); // שומר איזה כרטיס נפתח
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+  const [openDeleten, setOpenDelete] = useState(false);
+  const [recipeIdToDelete, setRecipeIdToDelete] = useState<number>();
+  const userId = localStorage.getItem("userId")
+    ? Number(localStorage.getItem("userId"))
+    : undefined;
+  // const handleExpandClick = (id: number) => {
+  //   setExpandedRecipeId(expandedRecipeId === id ? null : id); // אם נלחץ שוב על אותו כרטיס, נסגור אותו
+  // };
+  const handleDeleteClick = (id: number) => {
+    setRecipeIdToDelete(id);
+    setOpenDelete(true);
   };
-  const getRecipes = async () => {
+  //confirm delete func
+  const handleConfirmDelete = async () => {
     try {
-      var res = await axios.get("http://localhost:8080/api/recipe")
-      setRecipes(res.data)
-      console.log(res.data);
-      console.log(recipes);    
+      await axios.post(
+        `http://localhost:8080/api/recipe/delete/${recipeIdToDelete}`
+      );
       console.log("here");
-      
-    }
-    catch (err) {
-      console.error(err,"err2");
 
+      alert("delete success");
+      setOpenDelete(false);
+    } catch (error) {
+      console.error("Error delete album:", error);
     }
-  }
+  };
   useEffect(() => {
-   getRecipes();   
-  }, []); // ריק => רץ פעם אחת בעליית הקומפוננט
-
-  // שלב 2: שליחת עדכון לשרת כאשר המתכונים משתנים
-  /// useEffect(() => {
-  //   if (recipes.length === 0) return; // לא לשמור אם אין מתכונים
-
-  //   getRecipes();
-
-  // }, [recipes]); // רץ כל שינוי במערך
+    const getRecipes = async () => {
+      try {
+        const res = await axios.get("http://localhost:8080/api/recipe");
+        setRecipes(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getRecipes();
+  }, []);
 
   return (
-    <>
-    <h1>📖 מתכונים</h1>
-  
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-      {recipes.map(r => (
-        <Card key={r.Id} sx={{ borderRadius: 4, boxShadow: 3, overflow: 'hidden' }}>
-          <CardMedia
-            component="img"
-            height="200"
-            image={r.Img}
-            alt={r.Name}
-          />
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(4, 1fr)",
+        gap: "16px",
+      }}
+    >
+      {recipes.map((r) => (
+        <Card
+          key={r.Id}
+          sx={{ width: 300, minWidth: 300, borderRadius: 4, boxShadow: 3 }}
+        >
+          <CardMedia component="img" height="180" image={r.Img} alt={r.Name} />
           <CardContent>
-            <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ fontWeight: "bold", mb: 1 }}
+              noWrap
+            >
               {r.Name}
             </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', height: 40, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: "text.secondary",
+                height: 40,
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
               {r.Description}
             </Typography>
           </CardContent>
-          <CardActions sx={{ justifyContent: 'space-between', paddingX: 2 }}>
+
+          <CardActions sx={{ justifyContent: "space-between", paddingX: 2 }}>
+          <Button
+          component={Link}
+          to={`/recipedetail/${r.Id}`}
+  variant="contained"
+  startIcon={<MenuBookIcon />}
+  sx={{
+    backgroundColor: '#d32f2f',
+    '&:hover': {
+      backgroundColor: '#fff',
+      color:"#d32f2f"
+    },
+    borderRadius: '20px',
+    textTransform: 'none',
+    fontSize: '0.875rem',
+    padding: '4px 12px',
+  }}
+>
+  צפה במתכון
+</Button>
+
             <div>
-              <IconButton aria-label="add to favorites">
-                <FavoriteIcon />
-              </IconButton>
-              <IconButton aria-label="share">
-                <ShareIcon />
-              </IconButton>
+              {userId == r.UserId && (
+                <>
+                  <Tooltip title="ערוך מתכון">
+                    <IconButton sx={{color:"#d32f2f"}} onClick={() => {}}>
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="מחק מתכון">
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDeleteClick(r.Id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
+              )}
             </div>
-            <IconButton
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
-              <ExpandMoreIcon />
-            </IconButton>
+            {/* <IconButton onClick={() => handleExpandClick(r.Id)}>
+              <ExpandMoreIcon sx={{ transform: expandedRecipeId === r.Id ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }} />
+            </IconButton> */}
           </CardActions>
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
+
+          {/* <Collapse in={expandedRecipeId === r.Id} timeout="auto" unmountOnExit>
             <CardContent>
               <Typography variant="subtitle1" sx={{ fontWeight: 'bold', marginBottom: 1 }}>
                 אופן ההכנה
               </Typography>
-              <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
-                {/* {r.Method} נניח שיש לך שדה כזה במסד נתונים */}
-              </Typography>
-            </CardContent>
-          </Collapse>
+              <Typography variant="body2">
+                {/* פה ניתן להוסיף את אופן ההכנה */}
+          {/* </Typography>
+            </CardContent> */}
+          {/* </Collapse> */}
         </Card>
       ))}
+      <Modal open={openDeleten} onClose={() => setOpenDelete(false)}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "white",
+            boxShadow: 24,
+            p: 3,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h4" color="#e93345" gutterBottom>
+            Are you sure you want delete this album?
+          </Typography>
+          <Button
+            onClick={() => setOpenDelete(false)}
+            sx={{ mt: 2, color: "#e93345" }}
+          >
+            Close
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            sx={{ mt: 2, color: "#e93345" }}
+          >
+            Yes
+          </Button>
+        </Box>
+      </Modal>
     </div>
-  </>
-  
   );
-}
+};
+
 export default RecipeReviewCard;

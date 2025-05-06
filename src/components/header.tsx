@@ -14,11 +14,12 @@ const Header = () => {
   const { name, isLogin } = useLoginContext();
   const nav = useNavigate();
   return (
-    <>
+    <Box sx={{mb:10}}>
       <AppBar
         sx={{
           backgroundColor: "#fff",
           color: "#d32f2f",
+          mb:10
         }}
         // position="static"
       >
@@ -36,7 +37,7 @@ const Header = () => {
                 margin: "0px 15px 0px 15px",
               }}
             />
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex"} }}>
               <Box sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}>
                 <Link
                   to="/login"
@@ -103,7 +104,7 @@ const Header = () => {
           </Toolbar>
         </Container>
       </AppBar>
-    </>
+    </Box>
   );
 };
 export default Header;
