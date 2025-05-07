@@ -6,6 +6,8 @@ import {
   Grid,
   Paper,
   MenuItem,
+  Alert,
+  AlertTitle,
 } from "@mui/material";
 import { Add, Category, Delete } from "@mui/icons-material";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -14,23 +16,41 @@ import * as yup from "yup";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import LoadingCircle from "../components/loading";
 
 type FormValues = {
   Recipe: {
     Name: string;
     Img: string;
-    Instructions: { Name: string }[];
+    Instructions: { Id?: number; Name: string }[];
     Duration: number;
     Difficulty: number;
     Description: string;
     UserId: number;
     Categoryid: number;
     Ingridents: {
+      Id?: number;
       Name: string;
       Count: number;
       Type: string;
     }[];
   };
+};
+type Recipe = {
+  Name: string;
+  Img: string;
+  Instructions: { Id?: number; Name: string }[];
+  Duration: number;
+  Difficulty: number;
+  Description: string;
+  UserId: number;
+  Categoryid: number;
+  Ingridents: {
+    Id?: number;
+    Name: string;
+    Count: number;
+    Type: string;
+  }[];
 };
 
 // סכמת ולידציה עם כל השדות חובה
@@ -60,11 +80,14 @@ const schema = yup.object().shape({
     Categoryid: yup
       .number()
       .typeError("ID קטגוריה חייב להיות מספר")
-      .required("ID קטגוריה הוא שדה חובה"),
+      .required(" קטגוריה הוא שדה חובה"),
     Instructions: yup
       .array()
       .of(
-        yup.object().shape({ Name: yup.string().required("שלב הוא שדה חובה") })
+        yup.object().shape({
+          Name: yup.string().required("שלב לא יכול להיות ריק"),
+          Id: yup.number().optional(),
+        })
       )
       .min(2, "יש להוסיף לפחות 2 שלבים ")
       .required("שלבים הם שדה חובה"),
@@ -72,6 +95,7 @@ const schema = yup.object().shape({
       .array()
       .of(
         yup.object().shape({
+          Id: yup.number().optional(),
           Name: yup.string().required("שם רכיב הוא שדה חובה"),
           Count: yup
             .number()
@@ -93,10 +117,12 @@ type Category = {
 };
 
 const UpdateRecipe = () => {
-  // const UpdateRecipe = ({ recipeId }: { recipeId: number }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUpdateSuccess, setIsUpdateSuccess] = useState(false);
   const { recipeId } = useParams();
   const [categories, setCategories] = useState<Category[]>([]);
-  const [recipe, setRecipe] = useState<FormValues>();
+  const [currentCategoryId, setCurrentCategoryId] = useState<number>();
+  const [recipe, setRecipe] = useState<Recipe>();
   const getCategories = async () => {
     try {
       const res = await axios.get("http://localhost:8080/api/category");
@@ -110,8 +136,8 @@ const UpdateRecipe = () => {
       const res = await axios.get(
         `http://localhost:8080/api/recipe/${recipeId}`
       );
+      console.log(res.data);
       setRecipe(res.data);
-      reset({ Recipe: res.data.Recipe }); // זה הפתרון
     } catch (err) {
       console.error("failed to load the recipe");
     }
@@ -120,6 +146,7 @@ const UpdateRecipe = () => {
     if (recipeId) {
       getRecipe();
       getCategories();
+      setCurrentCategoryId(Number(recipe?.Categoryid));
     }
   }, [recipeId]);
   //form setting
@@ -132,19 +159,7 @@ const UpdateRecipe = () => {
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      Recipe: {
-        Name: "",
-        Img: "",
-        Instructions: [{ Name: "" }],
-        Duration: undefined,
-        Difficulty: undefined,
-        Description: "",
-        UserId: localStorage.getItem("userId")
-          ? Number(localStorage.getItem("userId"))
-          : undefined,
-        Categoryid: undefined,
-        Ingridents: [{ Name: "", Count: 1, Type: "" }],
-      },
+      Recipe: recipe,
     },
     mode: "onBlur",
   });
@@ -167,8 +182,8 @@ const UpdateRecipe = () => {
     name: "Recipe.Ingridents",
     control,
   });
-
   const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
     const fixedData = {
       ...data.Recipe,
       Categoryid: Number(data.Recipe.Categoryid),
@@ -178,21 +193,93 @@ const UpdateRecipe = () => {
     console.log("נתונים מתוקנים:", fixedData);
     console.log(JSON.stringify(fixedData, null, 2));
 
-    console.log(data);
-
     try {
       const res = await axios.post(
-        "http://localhost:8080/api/recipe",
+        "http://localhost:8080/api/recipe/edit",
         fixedData
       );
-      console.log(res.data);
+      setIsUpdateSuccess(true);
+      alert("edit");
+      console.log(res.data, isUpdateSuccess);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => {
+        setIsUpdateSuccess(false);
+      }, 3000);
     }
   };
 
+  useEffect(() => {
+    if (recipe) {
+      console.log(recipe, "here");
+
+      reset({
+        Recipe: {
+          ...recipe,
+
+          Instructions: recipe.Instructions?.length
+            ? recipe.Instructions
+            : [{ Name: "" }, { Name: "" }],
+          Ingridents: recipe.Ingridents?.length
+            ? recipe.Ingridents
+            : [
+                { Name: "", Count: 1, Type: "" },
+                { Name: "", Count: 1, Type: "" },
+              ],
+        },
+      });
+      setCurrentCategoryId(Number(recipe?.Categoryid));
+      console.log(currentCategoryId);
+    }
+  }, [recipe, reset]);
+  // useEffect(() => {
+  //   if (recipe) {
+  //     reset({
+  //       Recipe: {
+  //         ...recipe,
+  //         Instructions: recipe.Instructions?.length
+  //           ? recipe.Instructions
+  //           : [{ Name: "" }, { Name: "" }],
+  //         Ingridents: recipe.Ingridents?.length
+  //           ? recipe.Ingridents
+  //           : [
+  //               { Name: "", Count: 1, Type: "" },
+  //               { Name: "", Count: 1, Type: "" },
+  //             ],
+  //       },
+  //     });
+  //     // להוסיף את שלבי ההכנה ל-fieldArray
+  //     if (recipe.Instructions && recipe.Instructions.length > 0) {
+  //       instructionReplace(recipe.Instructions);
+  //     } else {
+  //       instructionReplace([
+  //         { Id: undefined, Name: "" },
+  //         { Id: undefined, Name: "" },
+  //       ]);
+  //     }
+
+  //     // להוסיף את הרכיבים ל-fieldArray
+  //     if (recipe.Ingridents && recipe.Ingridents.length > 0) {
+  //       ingridientsReplace(recipe.Ingridents);
+  //     } else {
+  //       ingridientsReplace([
+  //         { Id: undefined, Name: "", Count: 1, Type: "" },
+  //         { Id: undefined, Name: "", Count: 1, Type: "" },
+  //       ]);
+  //     }
+  //   }
+  // }, [recipe, reset, instructionReplace, ingridientsReplace]);
+
   return (
     <>
+      {isUpdateSuccess && (
+        <Alert severity="success">
+          <AlertTitle>Success Update Recipe</AlertTitle>
+          the recipe update!!
+        </Alert>
+      )}
       <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Paper
           elevation={6}
@@ -221,6 +308,7 @@ const UpdateRecipe = () => {
                   label="שם המתכון"
                   fullWidth
                   error={!!errors.Recipe?.Name}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <Typography color="error">
                   {errors?.Recipe?.Name?.message}
@@ -233,6 +321,7 @@ const UpdateRecipe = () => {
                   label="קישור לתמונה"
                   fullWidth
                   error={!!errors.Recipe?.Img}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <Typography color="error">
                   {errors?.Recipe?.Img?.message}
@@ -248,6 +337,7 @@ const UpdateRecipe = () => {
                   type="number"
                   fullWidth
                   error={!!errors.Recipe?.Duration}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <Typography color="error">
                   {errors?.Recipe?.Duration?.message}
@@ -263,6 +353,7 @@ const UpdateRecipe = () => {
                   type="number"
                   fullWidth
                   error={!!errors.Recipe?.Difficulty}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <Typography color="error">
                   {errors?.Recipe?.Difficulty?.message}
@@ -277,6 +368,7 @@ const UpdateRecipe = () => {
                   multiline
                   rows={3}
                   error={!!errors.Recipe?.Description}
+                  InputLabelProps={{ shrink: true }}
                 />
                 <Typography color="error">
                   {errors?.Recipe?.Description?.message}
@@ -287,21 +379,24 @@ const UpdateRecipe = () => {
                   select
                   label="קטגוריה"
                   fullWidth
-                  defaultValue={""}
                   {...register("Recipe.Categoryid", {
                     setValueAs: (v) => (v === "" ? null : Number(v)),
                   })}
+                  onChange={(e) => {
+                    setCurrentCategoryId(Number(e.target?.value)); // עדכון ה-state
+                  }}
                   error={!!errors.Recipe?.Categoryid}
+                  InputLabelProps={{ shrink: true }}
+                  value={currentCategoryId || ""} // עדכון דינמי
                 >
-                  <MenuItem value="">
-                    <em>בחר קטגוריה</em>
-                  </MenuItem>
+                  <MenuItem value="">{/* <em>בחר קטגוריה</em> */}</MenuItem>
                   {categories.map((category) => (
                     <MenuItem key={category.Id} value={category.Id}>
                       {category.Name}
                     </MenuItem>
                   ))}
                 </TextField>
+
                 <Typography color="error">
                   {errors?.Recipe?.Categoryid?.message}
                 </Typography>
@@ -313,32 +408,38 @@ const UpdateRecipe = () => {
                   שלבי הכנה
                 </Typography>
                 {instructionFields.map((instruction, index) => (
-                  <Box
-                    key={instruction.id}
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      mb: 1,
-                    }}
-                  >
-                    <TextField
-                      {...register(`Recipe.Instructions.${index}.Name`)}
-                      label={`שלב ${index + 1}`}
-                      fullWidth
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => removeInstruction(index)}
-                      color="error"
+                  <>
+                    <Box
+                      key={instruction.Id}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mb: 1,
+                      }}
                     >
-                      <Delete />
-                    </Button>
-                  </Box>
+                      <TextField
+                        {...register(`Recipe.Instructions.${index}.Name`)}
+                        label={`שלב ${index + 1}`}
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => removeInstruction(index)}
+                        color="error"
+                      >
+                        <Delete />
+                      </Button>
+                    </Box>
+                    <Typography color="error">
+                      {errors?.Recipe?.Instructions?.[index]?.Name?.message}
+                    </Typography>
+                  </>
                 ))}
                 <Button
                   type="button"
-                  onClick={() => appendInstruction({ Name: "" })}
+                  onClick={() => appendInstruction({ Id: undefined, Name: "" })}
                   variant="contained"
                   sx={{ bgcolor: "#d32f2f", color: "#ffffff" }}
                   startIcon={<Add />}
@@ -346,7 +447,7 @@ const UpdateRecipe = () => {
                   הוסף שלב
                 </Button>
                 <Typography color="error">
-                  {/* {errors?.Recipe?.Ingridents.} */}
+                  {errors?.Recipe?.Instructions?.message}
                 </Typography>
               </Grid>
 
@@ -356,46 +457,67 @@ const UpdateRecipe = () => {
                   רכיבים
                 </Typography>
                 {IngridentsFields.map((Ingridents, index) => (
-                  <Box
-                    key={Ingridents.id}
-                    sx={{
-                      display: "flex",
-                      gap: 1,
-                      alignItems: "center",
-                      mb: 1,
-                    }}
-                  >
-                    <TextField
-                      {...register(`Recipe.Ingridents.${index}.Name`)}
-                      label="שם רכיב"
-                      fullWidth
-                    />
-                    <TextField
-                      {...register(`Recipe.Ingridents.${index}.Count`, {
-                        setValueAs: (v) => (v === "" ? null : Number(v)),
-                      })}
-                      label="כמות"
-                      type="number"
-                      sx={{ width: "200px" }}
-                    />
-                    <TextField
-                      {...register(`Recipe.Ingridents.${index}.Type`)}
-                      label="סוג"
-                      sx={{ width: "200px" }}
-                    />
-                    <Button
-                      type="button"
-                      onClick={() => removeIngridents(index)}
-                      color="error"
+                  <>
+                    <Box
+                      key={Ingridents.id}
+                      sx={{
+                        display: "flex",
+                        gap: 1,
+                        alignItems: "center",
+                        mb: 1,
+                      }}
                     >
-                      <Delete />
-                    </Button>
-                  </Box>
+                      <TextField
+                        {...register(`Recipe.Ingridents.${index}.Name`)}
+                        label="שם רכיב"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                      />
+
+                      <TextField
+                        {...register(`Recipe.Ingridents.${index}.Count`, {
+                          setValueAs: (v) => (v === "" ? null : Number(v)),
+                        })}
+                        label="כמות"
+                        type="number"
+                        sx={{ width: "200px" }}
+                        InputLabelProps={{ shrink: true }}
+                      />
+
+                      <TextField
+                        {...register(`Recipe.Ingridents.${index}.Type`)}
+                        label="סוג"
+                        sx={{ width: "200px" }}
+                        InputLabelProps={{ shrink: true }}
+                      />
+                      <Button
+                        type="button"
+                        onClick={() => removeIngridents(index)}
+                        color="error"
+                      >
+                        <Delete />
+                      </Button>
+                    </Box>
+                    <Typography color="error">
+                      {errors?.Recipe?.Ingridents?.[index]?.Name?.message}
+                    </Typography>
+                    <Typography color="error">
+                      {errors?.Recipe?.Ingridents?.[index]?.Count?.message}
+                    </Typography>
+                    <Typography color="error">
+                      {errors?.Recipe?.Ingridents?.[index]?.Type?.message}
+                    </Typography>
+                  </>
                 ))}
                 <Button
                   type="button"
                   onClick={() =>
-                    appendIngridents({ Name: "", Count: 1, Type: "" })
+                    appendIngridents({
+                      Id: undefined,
+                      Name: "",
+                      Count: 1,
+                      Type: "",
+                    })
                   }
                   variant="contained"
                   sx={{ bgcolor: "#d32f2f", color: "#ffffff" }}
@@ -403,6 +525,9 @@ const UpdateRecipe = () => {
                 >
                   הוסף רכיב
                 </Button>
+                <Typography color="error">
+                  {errors?.Recipe?.Ingridents?.message}
+                </Typography>
               </Grid>
 
               {/* כפתור שליחה */}
@@ -410,7 +535,6 @@ const UpdateRecipe = () => {
                 <Button
                   onClick={() => {
                     console.log(watchedValues);
-                    console.log(JSON.stringify(watchedValues, null, 2));
                   }}
                 >
                   להדפסת הנתונים
@@ -425,6 +549,7 @@ const UpdateRecipe = () => {
                   }}
                   size="large"
                 >
+                  {isSubmitting && <LoadingCircle />}
                   שלח מתכון
                 </Button>
               </Grid>

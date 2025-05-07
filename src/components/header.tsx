@@ -1,105 +1,104 @@
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Container from "@mui/material/Container";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import Logo from "../pictures/Logo.jpg";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import { useLoginContext } from "./login.tsx";
-import { Typography } from "@mui/material";
+import { Link, useNavigate } from "react-router-dom";
+import Logo from "../images/Logo.jpg";
+
+// MUI icons
+import LoginIcon from "@mui/icons-material/Login";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import InfoIcon from "@mui/icons-material/Info";
+
+import { useLoginContext } from "../pages/login.tsx";
 
 const Header = () => {
-  const { name, isLogin } = useLoginContext();
+  const { name } = useLoginContext();
+  const isLogin = localStorage.getItem("isLogin")
+    ? localStorage.getItem("isLogin")
+    : undefined;
   const nav = useNavigate();
+
+  const linkStyle = {
+    color: "inherit",
+    textDecoration: "none",
+    display: "flex",
+    alignItems: "center",
+  };
+
+  const navBoxStyle = {
+    my: 2,
+    display: "flex",
+    alignItems: "center",
+    color: "#d32f2f",
+    px: 1,
+  };
+
   return (
-    <Box sx={{mb:10}}>
-      <AppBar
-        sx={{
-          backgroundColor: "#fff",
-          color: "#d32f2f",
-          mb:10
-        }}
-        // position="static"
-      >
+    <Box sx={{ mb: 10 }}>
+      <AppBar sx={{ backgroundColor: "#fff", color: "#d32f2f" }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
+            {/* Logo */}
             <img
-              onClick={() => {
-                nav("/home");
-              }}
+              onClick={() => nav("/home")}
               src={Logo}
               alt="description"
               style={{
                 width: "100px",
                 height: "auto",
-                margin: "0px 15px 0px 15px",
+                margin: "0 15px",
+                cursor: "pointer",
               }}
             />
-            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex"} }}>
-              <Box sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}>
-                <Link
-                  to="/login"
-                  style={{ color: "inherit", textDecoration: "none" }}
-                >
-                  Login
+
+            {/* Navigation Links */}
+            <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+              <Box sx={navBoxStyle}>
+                <Link to="/login" style={linkStyle}>
+                  <LoginIcon sx={{ mr: 0.5 }} /> Login
                 </Link>
               </Box>
-              {isLogin && (
+
+              {isLogin == "true" && (
                 <>
-                  <Box
-                    sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}
-                  >
-                    <Link
-                      to="/recipes"
-                      style={{ color: "inherit", textDecoration: "none" }}
-                    >
-                      our Recipes
+                  <Box sx={navBoxStyle}>
+                    <Link to="/recipes" style={linkStyle}>
+                      <MenuBookIcon sx={{ mr: 0.5 }} /> Our Recipes
                     </Link>
                   </Box>
-                  <Box
-                    sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}
-                  >
-                    <Link
-                      to="/login"
-                      style={{ color: "inherit", textDecoration: "none" }}
-                    >
-                      categories
-                    </Link>
-                  </Box>
-                  <Box
-                    sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}
-                  >
-                    <Link
-                      to="/addrecipe"
-                      style={{ color: "inherit", textDecoration: "none" }}
-                    >
-                      add Recipe
+                  <Box sx={navBoxStyle}>
+                    <Link to="/addrecipe" style={linkStyle}>
+                      <AddOutlinedIcon sx={{ mr: 0.5 }} /> Add Recipe
                     </Link>
                   </Box>
                 </>
               )}
-              <Box sx={{ my: 2, display: "block", color: "#d32f2f", px: 1 }}>
-                <Link
-                  to="/about"
-                  style={{ color: "inherit", textDecoration: "none" }}
-                >
-                  About Us🤏
+
+              <Box sx={navBoxStyle}>
+                <Link to="/about" style={linkStyle}>
+                  <InfoIcon sx={{ mr: 0.5 }} /> About Us
                 </Link>
               </Box>
             </Box>
-            <Box sx={{ flexGrow: 3, display: "flex", textAlign: "center" }}>
-              <Typography variant="h6" sx={{ color: "#d32f2f" }}>
-                Hello {name}
-              </Typography>
-            </Box>
 
-            <Box sx={{ flexGrow: 0, color: "#d32f2f" }}>
-              {/* {icon of profil} */}
-              <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-              </IconButton>
+            {/* User Avatar Circle */}
+            <Box
+              sx={{
+                color: "white",
+                fontSize: "20px",
+                borderRadius: "50%",
+                backgroundColor: "#d32f2f",
+                width: "45px",
+                height: "45px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                ml: 2,
+              }}
+            >
+              <p style={{ margin: 0 }}>{name?.charAt(0)}</p>
             </Box>
           </Toolbar>
         </Container>
@@ -107,4 +106,5 @@ const Header = () => {
     </Box>
   );
 };
+
 export default Header;

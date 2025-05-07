@@ -6,7 +6,6 @@ import {
   IconButton,
   Typography,
   CardActions,
-  Collapse,
   Tooltip,
   Modal,
   Button,
@@ -14,8 +13,6 @@ import {
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Info as InfoIcon,
-  ExpandMore as ExpandMoreIcon,
   MenuBook as MenuBookIcon,
 } from "@mui/icons-material";
 import axios from "axios";
@@ -31,7 +28,6 @@ type Recipe = {
 };
 
 const RecipeReviewCard = () => {
-  const [expandedRecipeId, setExpandedRecipeId] = useState<number | null>(null); // שומר איזה כרטיס נפתח
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [openDeleten, setOpenDelete] = useState(false);
   const [recipeIdToDelete, setRecipeIdToDelete] = useState<number>();
@@ -108,31 +104,31 @@ const RecipeReviewCard = () => {
           </CardContent>
 
           <CardActions sx={{ justifyContent: "space-between", paddingX: 2 }}>
-          <Button
-          component={Link}
-          to={`/recipedetail/${r.Id}`}
-  variant="contained"
-  startIcon={<MenuBookIcon />}
-  sx={{
-    backgroundColor: '#d32f2f',
-    '&:hover': {
-      backgroundColor: '#fff',
-      color:"#d32f2f"
-    },
-    borderRadius: '20px',
-    textTransform: 'none',
-    fontSize: '0.875rem',
-    padding: '4px 12px',
-  }}
->
-  צפה במתכון
-</Button>
+            <Button
+              component={Link}
+              to={`/recipedetail/${r.Id}`}
+              variant="contained"
+              startIcon={<MenuBookIcon />}
+              sx={{
+                backgroundColor: "#d32f2f",
+                "&:hover": {
+                  backgroundColor: "#fff",
+                  color: "#d32f2f",
+                },
+                borderRadius: "20px",
+                textTransform: "none",
+                fontSize: "0.875rem",
+                padding: "4px 12px",
+              }}
+            >
+              צפה במתכון
+            </Button>
 
             <div>
               {userId == r.UserId && (
                 <>
                   <Tooltip title="ערוך מתכון">
-                    <IconButton sx={{color:"#d32f2f"}} onClick={() => {}}>
+                    <IconButton sx={{ color: "#d32f2f" }} onClick={() => {}}>
                       <EditIcon />
                     </IconButton>
                   </Tooltip>
@@ -179,7 +175,7 @@ const RecipeReviewCard = () => {
           }}
         >
           <Typography variant="h4" color="#e93345" gutterBottom>
-            Are you sure you want delete this album?
+            Are you sure you want delete this recipe?
           </Typography>
           <Button
             onClick={() => setOpenDelete(false)}

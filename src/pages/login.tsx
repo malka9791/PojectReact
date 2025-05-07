@@ -1,9 +1,14 @@
 import { Button, Stack, TextField, Box, Typography } from "@mui/material";
-import { createContext, ReactElement, ReactNode, useContext, useState } from "react";
+import {
+  createContext,
+  ReactElement,
+  useContext,
+  useState,
+} from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Header from "./header";
+import Header from "../components/header";
 
 type LoginContextType = {
   name: string | null;
@@ -33,22 +38,21 @@ export const useLoginContext = () => {
 const Login = () => {
   const [username, SetUsername] = useState<string>("m");
   const [password, SetPassword] = useState<string>("111111");
-  const {SetMyName,SetIsLogin}=useLoginContext();
+  const { SetMyName, SetIsLogin } = useLoginContext();
   const nav = useNavigate();
 
   const onSubmit = async () => {
-    if(!username||!password)
-      return
+    if (!username || !password) return;
     try {
-      console.log(username,"*");
-      
       const res = await axios.post(`http://localhost:8080/api/user/login`, {
         UserName: username,
         Password: password,
       });
-      localStorage.setItem("userId",res.data.Id)
-      SetMyName(username)
-      SetIsLogin(true)
+      localStorage.setItem("userId", res.data.Id);
+      localStorage.setItem("name", res.data.Name);
+      localStorage.setItem("isLogin", "true");
+      SetMyName(res.data.Name);
+      SetIsLogin(true);
       nav("/home");
     } catch {
       nav("/signup");
@@ -60,9 +64,9 @@ const Login = () => {
   };
   return (
     <>
-    {/* <LoginProvider> */}
-      <Header/>
-      <br/>
+      {/* <LoginProvider> */}
+      <Header />
+      <br />
       <Box
         sx={{
           padding: 3,
@@ -110,7 +114,7 @@ const Login = () => {
           >
             Press to SignUp
           </Button>
-          
+
           <TextField
             required
             id="outlined-username"
@@ -176,7 +180,6 @@ const Login = () => {
                 "&:hover": {
                   backgroundColor: "#b71c1c", // Darker red on hover
                 },
-                
               }}
             >
               Send

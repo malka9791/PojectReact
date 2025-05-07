@@ -13,6 +13,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import LoadingCircle from "../components/loading";
 
 type FormValues = {
   Recipe: {
@@ -91,6 +92,7 @@ type Category = {
   updatedAt: Date;
 };
 const AddRecipe = () => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const getCategories = async () => {
     try {
@@ -149,12 +151,13 @@ const AddRecipe = () => {
   });
 
   const onSubmit = async (data: FormValues) => {
+    setIsSubmitting(true);
     const fixedData = {
       ...data.Recipe,
       Categoryid: Number(data.Recipe.Categoryid),
-      UserId:Number(data.Recipe.UserId)
+      UserId: Number(data.Recipe.UserId),
     };
-  
+
     console.log("נתונים מתוקנים:", fixedData);
     console.log(JSON.stringify(fixedData, null, 2));
 
@@ -165,15 +168,18 @@ const AddRecipe = () => {
         "http://localhost:8080/api/recipe",
         fixedData
       );
+      alert("the recipe add succes!!!");
       console.log(res.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "center"}}>
+      <Box sx={{ display: "flex", justifyContent: "center" }}>
         <Paper
           elevation={6}
           sx={{
@@ -391,7 +397,6 @@ const AddRecipe = () => {
                   onClick={() => {
                     console.log(watchedValues);
                     console.log(JSON.stringify(watchedValues, null, 2));
-
                   }}
                 >
                   להדפסת הנתונים
@@ -406,6 +411,7 @@ const AddRecipe = () => {
                   }}
                   size="large"
                 >
+                  {isSubmitting && <LoadingCircle />}
                   שלח מתכון
                 </Button>
               </Grid>

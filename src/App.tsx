@@ -1,21 +1,21 @@
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 import "./App.css";
-import Login from "./components/login";
-import Home from "./components/Home";
-import RecipeReviewCard from "./components/recipes";
+import Login from "./pages/login";
+import Home from "./pages/Home";
+import RecipeReviewCard from "./pages/recipes";
 import { Outlet, RouterProvider } from "react-router-dom";
 import Header from "./components/header";
-import Test from "./components/test"
+import Test from "./components/test";
 import MyRouter from "./Router";
 
 function App() {
   return (
-      <>
-      <RouterProvider router={MyRouter}/>
-      </>
+    <>
+      <RouterProvider router={MyRouter} />
+    </>
   );
 }
 

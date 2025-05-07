@@ -1,12 +1,10 @@
 import { useEffect, useState } from "react";
 import {
   Card,
-  CardContent,
   CardMedia,
   Typography,
   Button,
   Container,
-  Box,
   Grid,
   Divider,
   Chip,
@@ -92,12 +90,12 @@ const RecipeDetailPage = () => {
       {recipe ? (
         <Paper
           elevation={4}
-          sx={{ mt: 12, p: 3, borderRadius: 2, direction: "rtl", }}
+          sx={{ mt: 12, p: 3, borderRadius: 2, direction: "rtl" }}
         >
           <Typography
             variant="h2"
             align="center"
-            sx={{ mb: 3, fontWeight: "bold",color:"#d32f2f" }}
+            sx={{ mb: 3, fontWeight: "bold", color: "#d32f2f" }}
           >
             {recipe.Name}
           </Typography>
@@ -140,7 +138,10 @@ const RecipeDetailPage = () => {
 
           <Divider sx={{ my: 2 }} />
 
-          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1,color:"#d32f2f" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 1, color: "#d32f2f" }}
+          >
             תיאור
           </Typography>
           <Typography variant="body2" paragraph>
@@ -149,7 +150,10 @@ const RecipeDetailPage = () => {
 
           <Divider sx={{ my: 2 }} />
 
-          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1,color:"#d32f2f" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 1, color: "#d32f2f" }}
+          >
             רכיבים
           </Typography>
           <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mb: 2 }}>
@@ -171,7 +175,7 @@ const RecipeDetailPage = () => {
                   },
                   transition: "0.3s",
                   "&:hover": {
-                    scale:1.2,
+                    scale: 1.2,
                   },
                 }}
               />
@@ -180,7 +184,10 @@ const RecipeDetailPage = () => {
 
           <Divider sx={{ my: 2 }} />
 
-          <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1,color:"#d32f2f" }}>
+          <Typography
+            variant="h5"
+            sx={{ fontWeight: "bold", mb: 1, color: "#d32f2f" }}
+          >
             אופן הכנה
           </Typography>
           <ol>
@@ -192,20 +199,35 @@ const RecipeDetailPage = () => {
               </li>
             ))}
           </ol>
-
-          <Box sx={{ mt: 4, textAlign: "center" }}>
-            <Button
-              variant="contained"
-              color="primary"
-              component={Link}
-              to="/recipes"
-            >
-              חזרה לרשימת המתכונים
-            </Button>
-          </Box>
+          <Button
+            component={Link}
+            to={`/recipes`}
+            type="submit"
+            variant="contained"
+            fullWidth
+            sx={{
+              bgcolor: "#d32f2f",
+              color: "#fff",
+              fontSize: "18px",
+              margin: "normal",
+              mt: 3,
+              "&:hover": {
+                bgcolor: "white",
+                color:"#d32f2f"
+              },
+            }}
+            size="large"
+            // endIcon={<Send />}
+          >
+            חזרה לרשימת המתכונים
+          </Button>
         </Paper>
       ) : (
-        <Typography variant="h5" align="center" sx={{ mt: 5 ,color:"#d32f2f"}}>
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{ mt: 5, color: "#d32f2f" }}
+        >
           טוען את המתכון...
         </Typography>
       )}
