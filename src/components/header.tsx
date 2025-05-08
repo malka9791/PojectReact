@@ -4,17 +4,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import { Link, useNavigate } from "react-router-dom";
 import Logo from "../images/Logo.jpg";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 
 // MUI icons
 import LoginIcon from "@mui/icons-material/Login";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import InfoIcon from "@mui/icons-material/Info";
-
-import { useLoginContext } from "../pages/login.tsx";
+import { LoginContext } from "../hooks/loginContext";
+import { useContext } from "react";
 
 const Header = () => {
-  const { name } = useLoginContext();
+  const { name } = useContext(LoginContext);
   const isLogin = localStorage.getItem("isLogin")
     ? localStorage.getItem("isLogin")
     : undefined;
@@ -65,7 +66,14 @@ const Header = () => {
                 <>
                   <Box sx={navBoxStyle}>
                     <Link to="/recipes" style={linkStyle}>
-                      <MenuBookIcon sx={{ mr: 0.5 }} /> Our Recipes
+                      <MenuBookIcon sx={{ mr: 0.5 }} />
+                      Our Recipes
+                    </Link>
+                  </Box>
+                  <Box sx={navBoxStyle}>
+                    <Link to="/myRecipes" style={linkStyle}>
+                      <FavoriteBorderIcon sx={{ mr: 0.5 }} />
+                      My Recipes
                     </Link>
                   </Box>
                   <Box sx={navBoxStyle}>

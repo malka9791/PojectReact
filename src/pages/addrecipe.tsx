@@ -8,7 +8,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import { Add, Category, Delete } from "@mui/icons-material";
-import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect, useState } from "react";
@@ -32,6 +32,7 @@ type FormValues = {
     }[];
   };
 };
+const difficultyLevels = ["קל", "בינוני", "קשה"];
 
 // סכמת ולידציה עם כל השדות חובה
 const schema = yup.object().shape({
@@ -48,19 +49,17 @@ const schema = yup.object().shape({
       .positive("זמן חייב להיות מספר חיובי"),
     Difficulty: yup
       .number()
-      .typeError("רמת קושי חייבת להיות מספר")
       .required("רמת קושי היא שדה חובה")
-      .min(1, "רמת קושי חייבת להיות בין 1 ל-5")
-      .max(5, "רמת קושי חייבת להיות בין 1 ל-5"),
+      .typeError("רמת קושי היא שדה חובה"),
     Description: yup.string().required("תיאור הוא שדה חובה"),
     UserId: yup
       .number()
-      .typeError("ID משתמש חייב להיות מספר")
-      .required("ID משתמש הוא שדה חובה"),
+      .required(" משתמש הוא שדה חובה")
+      .typeError(" משתמש חייב להיות מספר"),
     Categoryid: yup
       .number()
-      .typeError("ID קטגוריה חייב להיות מספר")
-      .required("ID קטגוריה הוא שדה חובה"),
+      .required(" קטגוריה הוא שדה חובה")
+      .typeError("  קטגוריה הוא שדה חובה"),
     Instructions: yup
       .array()
       .of(
@@ -130,7 +129,6 @@ const AddRecipe = () => {
     },
     mode: "onBlur",
   });
-  const watchedValues = useWatch({ control });
 
   const {
     fields: instructionFields,
@@ -158,18 +156,9 @@ const AddRecipe = () => {
       UserId: Number(data.Recipe.UserId),
     };
 
-    console.log("נתונים מתוקנים:", fixedData);
-    console.log(JSON.stringify(fixedData, null, 2));
-
-    console.log(data);
-
     try {
-      const res = await axios.post(
-        "http://localhost:8080/api/recipe",
-        fixedData
-      );
+      await axios.post("http://localhost:8080/api/recipe", fixedData);
       alert("the recipe add succes!!!");
-      console.log(res.data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -239,17 +228,26 @@ const AddRecipe = () => {
                   {errors?.Recipe?.Duration?.message}
                 </Typography>
               </Grid>
-
               <Grid item xs={6}>
                 <TextField
+                  select
+                  label="רמת קושי"
+                  fullWidth
+                  defaultValue={""}
                   {...register("Recipe.Difficulty", {
                     setValueAs: (v) => (v === "" ? null : Number(v)),
                   })}
-                  label="רמת קושי (1-5)"
-                  type="number"
-                  fullWidth
                   error={!!errors.Recipe?.Difficulty}
-                />
+                >
+                  <MenuItem value="">
+                    <em>בחר רמת קושי</em>
+                  </MenuItem>
+                  {difficultyLevels.map((d, index) => (
+                    <MenuItem key={index} value={index}>
+                      {d}
+                    </MenuItem>
+                  ))}
+                </TextField>
                 <Typography color="error">
                   {errors?.Recipe?.Difficulty?.message}
                 </Typography>
@@ -393,14 +391,6 @@ const AddRecipe = () => {
 
               {/* כפתור שליחה */}
               <Grid item xs={12} sx={{ textAlign: "center", mt: 2 }}>
-                <Button
-                  onClick={() => {
-                    console.log(watchedValues);
-                    console.log(JSON.stringify(watchedValues, null, 2));
-                  }}
-                >
-                  להדפסת הנתונים
-                </Button>
                 <Button
                   type="submit"
                   variant="contained"

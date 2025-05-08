@@ -1,6 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Header from "./header";
-import { LoginProvider } from "../pages/login";
+import { LoginProvider } from "../hooks/loginContext";
 
 const AppLayout = () => {
   return (

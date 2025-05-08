@@ -57,7 +57,6 @@ const SignUp = () => {
   });
   //submit function
   const onSubmit = async (data: FormValues) => {
-    console.log(data);
     //get function from authAction
     try {
       const res = await axios.post(

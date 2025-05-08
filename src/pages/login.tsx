@@ -1,44 +1,20 @@
 import { Button, Stack, TextField, Box, Typography } from "@mui/material";
 import {
-  createContext,
-  ReactElement,
   useContext,
   useState,
 } from "react";
 import SendIcon from "@mui/icons-material/Send";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import Header from "../components/header";
+import   { LoginContext } from "../hooks/loginContext";
+ "../hooks/loginContext";
 
-type LoginContextType = {
-  name: string | null;
-  SetMyName: (name: string) => void;
-  isLogin: boolean | false;
-  SetIsLogin: (islogin: boolean) => void;
-};
-const LoginContext = createContext<LoginContextType | undefined>(undefined);
 
-export const LoginProvider = ({ children }: { children: ReactElement }) => {
-  const [name, SetMyName] = useState<string>("?");
-  const [isLogin, SetIsLogin] = useState<boolean>(false);
-  return (
-    <LoginContext.Provider value={{ name, SetMyName, isLogin, SetIsLogin }}>
-      {children}
-    </LoginContext.Provider>
-  );
-};
-export const useLoginContext = () => {
-  const context = useContext(LoginContext);
-  if (!context) {
-    throw new Error("useLoginContext must be used within a LoginProvider");
-  }
-  return context;
-};
 
 const Login = () => {
-  const [username, SetUsername] = useState<string>("m");
-  const [password, SetPassword] = useState<string>("111111");
-  const { SetMyName, SetIsLogin } = useLoginContext();
+  const [username, SetUsername] = useState<string>("");
+  const [password, SetPassword] = useState<string>("");
+  const { setName, setIsLogin } = useContext(LoginContext);
   const nav = useNavigate();
 
   const onSubmit = async () => {
@@ -51,8 +27,8 @@ const Login = () => {
       localStorage.setItem("userId", res.data.Id);
       localStorage.setItem("name", res.data.Name);
       localStorage.setItem("isLogin", "true");
-      SetMyName(res.data.Name);
-      SetIsLogin(true);
+      setName(res.data.Name);
+      setIsLogin("true");
       nav("/home");
     } catch {
       nav("/signup");
@@ -64,9 +40,6 @@ const Login = () => {
   };
   return (
     <>
-      {/* <LoginProvider> */}
-      <Header />
-      <br />
       <Box
         sx={{
           padding: 3,
@@ -187,7 +160,6 @@ const Login = () => {
           </Stack>
         </Box>
       </Box>
-      {/* </LoginProvider> */}
     </>
   );
 };

@@ -61,7 +61,7 @@ const durations: Duration[] = [
   { value: 999, label: "מעל שעתיים" },
 ];
 
-const RecipesCards = () => {
+const MyRecipe = () => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [openDelete, setOpenDelete] = useState(false);
@@ -86,6 +86,7 @@ const RecipesCards = () => {
   };
 
   const handleDifficultyChange = (event: SelectChangeEvent) => {
+
     setDifficultyLevel(Number(event.target.value));
   };
 
@@ -140,9 +141,10 @@ const RecipesCards = () => {
   //get recipes function
   const getRecipes = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/recipe");
-      setRecipes(res.data);
-      setFilteredRecipes(res.data);
+      const res = await axios.get<Recipe[]>("http://localhost:8080/api/recipe");
+      const filterToMyRecipe=res.data.filter((r)=>r.UserId==userId);
+      setRecipes(filterToMyRecipe);
+      setFilteredRecipes(filterToMyRecipe);
     } catch (err) {
       console.error(err);
     }
@@ -152,9 +154,11 @@ const RecipesCards = () => {
     getRecipes();
     getCategories();
   }, []);
+
   // Apply filters
   useEffect(() => {
     let result = [...recipes];
+
     if (category) {
       result = result.filter(
         (recipe) => recipe.Categoryid === Number(category)
@@ -334,9 +338,7 @@ const RecipesCards = () => {
                       label={`קטגוריה: ${getCategoryNameById(
                         Number(category)
                       )}`}
-                      onDelete={() => {
-                        setCategory("");
-                      }}
+                      onDelete={() => setCategory("")}
                       color="error"
                       variant="outlined"
                       sx={{ borderRadius: "16px" }}
@@ -524,8 +526,6 @@ const RecipesCards = () => {
                   צפה במתכון
                 </Button>
 
-                <div>
-                  {userId == r.UserId && (
                     <>
                       <Tooltip title="ערוך מתכון">
                         <IconButton
@@ -557,8 +557,6 @@ const RecipesCards = () => {
                         </IconButton>
                       </Tooltip>
                     </>
-                  )}
-                </div>
               </CardActions>
             </Card>
           ))
@@ -635,4 +633,4 @@ const RecipesCards = () => {
   );
 };
 
-export default RecipesCards;
+export default MyRecipe;
