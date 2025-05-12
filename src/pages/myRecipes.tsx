@@ -86,7 +86,6 @@ const MyRecipe = () => {
   };
 
   const handleDifficultyChange = (event: SelectChangeEvent) => {
-
     setDifficultyLevel(Number(event.target.value));
   };
 
@@ -96,9 +95,8 @@ const MyRecipe = () => {
 
   const handleResetFilters = () => {
     setCategory("");
-    setDifficultyLevel(null);
+    setDifficultyLevel(undefined);
     setDuration(null);
-    setFilteredRecipes(recipes);
   };
 
   // Toggle filters visibility
@@ -142,7 +140,7 @@ const MyRecipe = () => {
   const getRecipes = async () => {
     try {
       const res = await axios.get<Recipe[]>("http://localhost:8080/api/recipe");
-      const filterToMyRecipe=res.data.filter((r)=>r.UserId==userId);
+      const filterToMyRecipe = res.data.filter((r) => r.UserId == userId);
       setRecipes(filterToMyRecipe);
       setFilteredRecipes(filterToMyRecipe);
     } catch (err) {
@@ -172,7 +170,7 @@ const MyRecipe = () => {
     }
 
     if (duration !== null) {
-      if (duration <= 120) {
+      if (duration && duration <= 120) {
         result = result.filter(
           (recipe) => recipe.Duration && recipe.Duration <= duration
         );
@@ -272,7 +270,7 @@ const MyRecipe = () => {
                   >
                     <MenuItem value=""></MenuItem>
                     {difficultyLevels.map((level, index) => (
-                      <MenuItem key={index} value={index}>
+                      <MenuItem key={index} value={index - 1}>
                         {level}
                       </MenuItem>
                     ))}
@@ -285,7 +283,11 @@ const MyRecipe = () => {
                   <InputLabel id="duration-label">משך זמן</InputLabel>
                   <Select
                     labelId="duration-label"
-                    value={duration === null ? "" : duration.toString()}
+                    value={
+                      duration === null || typeof duration === "undefined"
+                        ? ""
+                        : duration.toString()
+                    }
                     onChange={handleDurationChange}
                     label="משך זמן"
                     sx={{ borderRadius: "8px" }}
@@ -346,8 +348,10 @@ const MyRecipe = () => {
                   )}
                   {difficultyLevel != null && (
                     <Chip
-                      label={`רמת קושי: ${difficultyLevels[difficultyLevel]}`}
-                      onDelete={() => setDifficultyLevel(null)}
+                      label={`רמת קושי: ${
+                        difficultyLevels[difficultyLevel - 1]
+                      }`}
+                      onDelete={() => setDifficultyLevel(undefined)}
                       color="error"
                       variant="outlined"
                       sx={{ borderRadius: "16px" }}
@@ -470,7 +474,7 @@ const MyRecipe = () => {
                     {r.Difficulty && (
                       <Chip
                         icon={<FitnessCenterIcon sx={{ fontSize: 16 }} />}
-                        label={difficultyLevels[r.Difficulty]}
+                        label={difficultyLevels[r.Difficulty - 1]}
                         size="small"
                         sx={{
                           backgroundColor: "rgba(211, 47, 47, 0.1)",
@@ -526,37 +530,37 @@ const MyRecipe = () => {
                   צפה במתכון
                 </Button>
 
-                    <>
-                      <Tooltip title="ערוך מתכון">
-                        <IconButton
-                          sx={{
-                            color: "#d32f2f",
-                            transition: "transform 0.2s",
-                            "&:hover": {
-                              transform: "scale(1.1)",
-                            },
-                          }}
-                          component={Link}
-                          to={`/update/${r.Id}`}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                      <Tooltip title="מחק מתכון">
-                        <IconButton
-                          color="error"
-                          onClick={() => handleDeleteClick(r.Id)}
-                          sx={{
-                            transition: "transform 0.2s",
-                            "&:hover": {
-                              transform: "scale(1.1)",
-                            },
-                          }}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </>
+                <>
+                  <Tooltip title="ערוך מתכון">
+                    <IconButton
+                      sx={{
+                        color: "#d32f2f",
+                        transition: "transform 0.2s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                        },
+                      }}
+                      component={Link}
+                      to={`/update/${r.Id}`}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title="מחק מתכון">
+                    <IconButton
+                      color="error"
+                      onClick={() => handleDeleteClick(r.Id)}
+                      sx={{
+                        transition: "transform 0.2s",
+                        "&:hover": {
+                          transform: "scale(1.1)",
+                        },
+                      }}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </Tooltip>
+                </>
               </CardActions>
             </Card>
           ))

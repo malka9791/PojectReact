@@ -95,9 +95,8 @@ const RecipesCards = () => {
 
   const handleResetFilters = () => {
     setCategory("");
-    setDifficultyLevel(null);
+    setDifficultyLevel(undefined);
     setDuration(null);
-    setFilteredRecipes(recipes);
   };
 
   // Toggle filters visibility
@@ -168,7 +167,7 @@ const RecipesCards = () => {
     }
 
     if (duration !== null) {
-      if (duration <= 120) {
+      if (duration && duration <= 120) {
         result = result.filter(
           (recipe) => recipe.Duration && recipe.Duration <= duration
         );
@@ -268,7 +267,7 @@ const RecipesCards = () => {
                   >
                     <MenuItem value=""></MenuItem>
                     {difficultyLevels.map((level, index) => (
-                      <MenuItem key={index} value={index}>
+                      <MenuItem key={index} value={index - 1}>
                         {level}
                       </MenuItem>
                     ))}
@@ -281,7 +280,11 @@ const RecipesCards = () => {
                   <InputLabel id="duration-label">משך זמן</InputLabel>
                   <Select
                     labelId="duration-label"
-                    value={duration === null ? "" : duration.toString()}
+                    value={
+                      duration === null || typeof duration === "undefined"
+                        ? ""
+                        : duration.toString()
+                    }
                     onChange={handleDurationChange}
                     label="משך זמן"
                     sx={{ borderRadius: "8px" }}
@@ -345,7 +348,7 @@ const RecipesCards = () => {
                   {difficultyLevel != null && (
                     <Chip
                       label={`רמת קושי: ${difficultyLevels[difficultyLevel]}`}
-                      onDelete={() => setDifficultyLevel(null)}
+                      onDelete={() => setDifficultyLevel(undefined)}
                       color="error"
                       variant="outlined"
                       sx={{ borderRadius: "16px" }}
@@ -468,7 +471,7 @@ const RecipesCards = () => {
                     {r.Difficulty && (
                       <Chip
                         icon={<FitnessCenterIcon sx={{ fontSize: 16 }} />}
-                        label={difficultyLevels[r.Difficulty]}
+                        label={difficultyLevels[r.Difficulty - 1]}
                         size="small"
                         sx={{
                           backgroundColor: "rgba(211, 47, 47, 0.1)",

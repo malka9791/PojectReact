@@ -186,6 +186,7 @@ const UpdateRecipe = () => {
     setIsSubmitting(true);
     const fixedData = {
       ...data.Recipe,
+      Difficulty:Number(data.Recipe.Difficulty),
       Categoryid: Number(data.Recipe.Categoryid),
       UserId: Number(data.Recipe.UserId),
     };
@@ -218,8 +219,9 @@ const UpdateRecipe = () => {
               ],
         },
       });
+
       setCurrentCategoryId(Number(recipe?.Categoryid));
-      setCurrentDifficultyId(Number(recipe?.Categoryid));
+      setCurrentDifficultyId(Number(recipe?.Difficulty));
     }
   }, [recipe, reset]);
 
@@ -334,22 +336,26 @@ const UpdateRecipe = () => {
                   select
                   label="רמת קושי"
                   fullWidth
-                  defaultValue={""}
                   {...register("Recipe.Difficulty", {
                     setValueAs: (v) => (v === "" ? null : Number(v)),
                   })}
                   onChange={(e) => {
-                    setCurrentDifficultyId(Number(e.target?.value)); // עדכון ה-state
+                    setCurrentDifficultyId(Number(e.target?.value)+1);                    
+                    // עדכון ה-state
                   }}
                   error={!!errors.Recipe?.Difficulty}
+                  InputLabelProps={{ shrink: true }}
+                  value={currentDifficultyId === null ||
+                    typeof currentDifficultyId === "undefined"
+                      ? ""
+                      : currentDifficultyId} // עדכון דינמי
                 >
-                  value={currentDifficultyId || ""} // עדכון דינמי
                   <MenuItem value="">
                     <em>בחר רמת קושי</em>
                   </MenuItem>
                   {difficultyLevels.map((d, index) => (
-                    <MenuItem key={index} value={index + 1}>
-                      {d}
+                    <MenuItem key={index} value={index+1}>
+                      {d} {index+1}
                     </MenuItem>
                   ))}
                 </TextField>

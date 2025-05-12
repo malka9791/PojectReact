@@ -243,7 +243,7 @@ const AddRecipe = () => {
                     <em>בחר רמת קושי</em>
                   </MenuItem>
                   {difficultyLevels.map((d, index) => (
-                    <MenuItem key={index} value={index}>
+                    <MenuItem key={index} value={index + 1}>
                       {d}
                     </MenuItem>
                   ))}
